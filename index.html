@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Firebase IoT Project</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    h1 {
+      color: #2196F3;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #2196F3;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1976D2;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Firebase IoT Project</h1>
+
+    <p><b>Hotspot Name:</b> Galaxy M21</p>
+
+    <p id="firebaseStatus" class="status">
+      Connecting to Firebase...
+    </p>
+
+    <button id="testButton">
+      Test Firebase
+    </button>
+
+    <p id="result"></p>
+
+  </div>
+
+
+  <!-- =====================================================
+       FIREBASE
+       ===================================================== -->
+
+  <script type="module">
+
+    // Firebase SDK
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+    import {
+      getDatabase,
+      ref,
+      set,
+      get
+    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+
+
+    // =====================================================
+    // FIREBASE CONFIGURATION
+    // =====================================================
+
+    const firebaseConfig = {
+
+      apiKey: "HQnL1mzMoeNRBvxZ452GCENjxbQTMx7092hsRAd0",
+
+      authDomain: "crrmb-team.firebaseapp.com",
+
+      databaseURL:
+        "https://crrmb-team-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+      projectId: "crrmb-team",
+
+      storageBucket:
+        "crrmb-team.firebasestorage.app",
+
+      messagingSenderId:
+        "617194364092",
+
+      appId:
+        "1:617194364092:web:a6e56b7f1d5f34c68484b9"
+
+    };
+
+
+    // =====================================================
+    // INITIALIZE FIREBASE
+    // =====================================================
+
+    const app = initializeApp(firebaseConfig);
+
+    const database = getDatabase(app);
+
+
+    // =====================================================
+    // FIREBASE CONNECTION STATUS
+    // =====================================================
+
+    const status = document.getElementById("firebaseStatus");
+
+    status.innerText = "Firebase connected successfully";
+
+
+    // =====================================================
+    // TEST BUTTON
+    // =====================================================
+
+    const testButton = document.getElementById("testButton");
+
+    const result = document.getElementById("result");
+
+
+    testButton.addEventListener("click", async () => {
+
+      try {
+
+        // Data to send to Firebase
+        const testData = {
+          device: "ESP32",
+          hotspot: "Galaxy M21",
+          status: "online",
+          time: new Date().toLocaleString()
+        };
+
+
+        // Firebase database location
+        const testRef = ref(database, "test");
+
+
+        // Write data
+        await set(testRef, testData);
+
+
+        // Read data
+        const snapshot = await get(testRef);
+
+
+        if (snapshot.exists()) {
+
+          console.log(snapshot.val());
+
+          result.innerHTML =
+            "<b>Firebase Test Successful!</b><br><br>" +
+            JSON.stringify(snapshot.val(), null, 2);
+
+        } else {
+
+          result.innerText =
+            "Data was written but could not be read.";
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        result.innerHTML =
+          "<b>Firebase Error:</b><br>" +
+          error.message;
+
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
